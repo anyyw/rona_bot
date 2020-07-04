@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 import os
 import discord
-import req
+import requests
+import random
 from dotenv import load_dotenv
 
 from discord.ext import commands
@@ -27,10 +28,29 @@ async def on_member_join(member):
         I can do!"""
     )
 
-@bot.command(name='booya', help='Responds with hell ya')
-async def on_message(message):
-    response = 'Hell ya'
-    await message.channel.send(response)
+@bot.command(name='debug', help='debug print statement')
+async def print_debug(context):
+    response = 'Beep Boop, I here'
+    await context.send(response)
+
+@bot.command(name='roll_dice', help='Simulates rolling dice.')
+async def roll(ctx, number_of_dice: int, number_of_sides: int):
+    dice = [
+        str(random.choice(range(1, number_of_sides + 1)))
+        for _ in range(number_of_dice)
+    ]
+    await ctx.send(', '.join(dice))
+
+@bot.command(name='bruh', help='Bruh, bruhh, bruuuuhhhh.')
+async def bruh(ctx, bruh_length: int):
+    await ctx.send('Bruuu' + ('h' * bruh_length))
+
+@bot.command(name='rona', help='Current coronavirus stats in the US, Source: CDC rest API')
+async def rona(ctx, state='All'):
+    url = 'https://covidtracking.com/api/states'
+    request = 'https://{}'.format(url)
+    response = requests.get(request)
+    await ctx.send(response)
 
 @bot.event
 async def on_error(event, *args, **kwargs):
@@ -38,6 +58,12 @@ async def on_error(event, *args, **kwargs):
         if event == 'on_message':
             f.write(f'Unhandled message: {args[0]}\n')
         else:
-            raise
+            raise NotImplementedError
 
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.errors.CheckFailure):
+        await ctx.send('You do not have the correct role for this command.')
+    else:
+        await ctx.send('Somthing went wrong, pinging @ApatheticDino')
 bot.run(TOKEN)
