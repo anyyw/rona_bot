@@ -3,6 +3,8 @@ import os
 import discord
 import requests
 import random
+import json
+import asyncio
 from dotenv import load_dotenv
 
 from discord.ext import commands
@@ -41,29 +43,51 @@ async def roll(ctx, number_of_dice: int, number_of_sides: int):
     ]
     await ctx.send(', '.join(dice))
 
-@bot.command(name='bruh', help='Bruh, bruhh, bruuuuhhhh.')
-async def bruh(ctx, bruh_length: int):
-    await ctx.send('Bruuu' + ('h' * bruh_length))
+# @bot.command(name='bruh', help='Bruh, bruhh, bruuuuhhhh.')
+# async def bruh(ctx, bruh_length: int):
+#     await ctx.send('Bruuu' + ('h' * bruh_length))
 
-@bot.command(name='rona', help='Current coronavirus stats in the US, Source: CDC rest API')
+@bot.command(name='bruh', help='Bruh in voice channel.')
+async def bruh_mp3(ctx):
+    # grab the user who sent the command
+    voice_state = ctx.author.voice
+    channel = None
+    # only play music if user is in a voice channel
+    if voice_state != None:
+        # grab user's voice channel
+        channel = voice_state.channel
+        await ctx.send('User is in channel: '+ channel.name)
+        # create StreamPlayer
+        vc = await channel.connect()
+        vc.play(discord.FFmpegPCMAudio('sounds/bruh.mp3'))
+        vc.volume = 100
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        await vc.disconnect()
+    else:
+        await ctx.send('The Bruh was not uttered, user outside of a voice channel')
+
+@bot.command(name='rona', help='Current coronavirus stats in the US')
 async def rona(ctx, state='All'):
-    url = 'https://covidtracking.com/api/states'
+    url = 'covidtracking.com/api/states'
     request = 'https://{}'.format(url)
     response = requests.get(request)
     await ctx.send(response)
 
-@bot.event
-async def on_error(event, *args, **kwargs):
-    with open('err.log', 'a') as f:
-        if event == 'on_message':
-            f.write(f'Unhandled message: {args[0]}\n')
-        else:
-            raise NotImplementedError
+# @bot.event
+# async def on_error(event, *args, **kwargs):
+#     with open('err.log', 'a') as f:
+#         if event == 'on_message':
+#             f.write(f'Unhandled message: {args[0]}\n')
+#         else:
+#             raise NotImplementedError
 
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
         await ctx.send('You do not have the correct role for this command.')
+    elif isinstance(error, commands.errors.CommandNotFound):
+        await ctx.send('Command not found, type !help for a list of commands')
     else:
-        await ctx.send('Somthing went wrong, pinging @ApatheticDino')
+        await ctx.send('Got unhandled error {}, error type {}. Pinging @ApatheticDino'.format(error, error.__class__))
 bot.run(TOKEN)
