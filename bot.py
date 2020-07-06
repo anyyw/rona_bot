@@ -48,24 +48,37 @@ async def roll(ctx, number_of_dice: int, number_of_sides: int):
 #     await ctx.send('Bruuu' + ('h' * bruh_length))
 
 @bot.command(name='bruh', help='Bruh in voice channel.')
-async def bruh_mp3(ctx):
+async def bruh_mp3(ctx, length: int = 1):
+    # bruh length should always be positive
+    length = abs(length)
+
     # grab the user who sent the command
     voice_state = ctx.author.voice
     channel = None
-    # only play music if user is in a voice channel
-    if voice_state != None:
+    # validation
+    if length > 5:
+        await ctx.send('Bruh too long, pls stop')
+    elif voice_state == None:
+        await ctx.send('The Bruh was uttered but it did not make a sound, user outside of a voice channel')
+    else:
         # grab user's voice channel
         channel = voice_state.channel
-        await ctx.send('User is in channel: '+ channel.name)
+        await ctx.send('Channel {}: bruh{} '.format(channel.name, 'hhh' * length))
         # create StreamPlayer
         vc = await channel.connect()
-        vc.play(discord.FFmpegPCMAudio('sounds/bruh.mp3'))
+        atempo_option = 'atempo=0.8'
+        clip_length = []
+        for n in range(length):
+            clip_length.append(atempo_option)
+        options = '-filter:a "{}"'.format(','.join(clip_length))
+        vc.play(discord.FFmpegPCMAudio(
+            source='sounds/bruh.mp3', 
+            options=options))
         vc.volume = 100
         while vc.is_playing():
             await asyncio.sleep(1)
         await vc.disconnect()
-    else:
-        await ctx.send('The Bruh was not uttered, user outside of a voice channel')
+        
 
 @bot.command(name='rona', help='Current coronavirus stats in the US')
 async def rona(ctx, state='All'):
@@ -88,6 +101,8 @@ async def on_command_error(ctx, error):
         await ctx.send('You do not have the correct role for this command.')
     elif isinstance(error, commands.errors.CommandNotFound):
         await ctx.send('Command not found, type !help for a list of commands')
+    elif isinstance(error, commands.errors.BadArgument):
+        await ctx.send('Invalid argument, please refer to help for specific command')
     else:
         await ctx.send('Got unhandled error {}, error type {}. Pinging @ApatheticDino'.format(error, error.__class__))
 bot.run(TOKEN)
