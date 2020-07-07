@@ -49,21 +49,20 @@ async def roll(ctx, number_of_dice: int, number_of_sides: int):
 
 @bot.command(name='bruh', help='Bruh in voice channel.')
 async def bruh_mp3(ctx, length: int = 1):
-    # bruh length should always be positive
-    length = abs(length)
-
     # grab the user who sent the command
     voice_state = ctx.author.voice
     channel = None
     # validation
-    if length > 5:
+    if length > 10:
         await ctx.send('Bruh too long, pls stop')
+    elif length <= 0:
+        await ctx.send('Y Bruh less than or equal to 0?')
     elif voice_state == None:
         await ctx.send('The Bruh was uttered but it did not make a sound, user outside of a voice channel')
     else:
         # grab user's voice channel
         channel = voice_state.channel
-        await ctx.send('Channel {}: bruh{} '.format(channel.name, 'hhh' * length))
+        # await ctx.send('Channel {}: bruh{} '.format(channel.name, 'hhh' * length))
         # create StreamPlayer
         vc = await channel.connect()
         atempo_option = 'atempo=0.8'
@@ -80,12 +79,58 @@ async def bruh_mp3(ctx, length: int = 1):
         await vc.disconnect()
         
 
+@bot.command(name='airhorn', help='Brrrrrrr!')
+async def airhorn_mp3(ctx, count: int = 1):
+    # grab the user who sent the command
+    voice_state = ctx.author.voice
+    channel = None
+    # validation
+    if count > 10:
+        await ctx.send('Too many airhorns!')
+    elif count <= 0:
+        await ctx.send('Too few airhorns')
+    elif voice_state == None:
+        await ctx.send('The Airhorn was blasted but it did not make a sound, user outside of a voice channel')
+    else:
+        # grab user's voice channel
+        channel = voice_state.channel
+        # await ctx.send('Channel {}: bruh{} '.format(channel.name, 'hhh' * length))
+        # create StreamPlayer
+        vc = await channel.connect()
+        # play mini length airhorns
+        for i in range(count - 1):
+            clip = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
+                source='audio/airhorn_default.wav',
+                options='-to 0.22'))
+            clip.volume = 0.3
+            vc.play(clip)
+            while vc.is_playing():
+                await asyncio.sleep(0.01)
+        
+        # play last full length airhorn
+        clip = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
+            source='audio/airhorn_default.wav'))
+        clip.volume = 0.3
+        vc.play(clip)
+        while vc.is_playing():
+            await asyncio.sleep(0.1)
+        await vc.disconnect()
+
+'''
+Command that shows stats on current coronavirus, hopefully this will be outdated soon
+TODO: Current implementation makes a request per command, since the website likely updates
+daily, we should just be able to cache the json and update it every day on command read
+'''
 @bot.command(name='rona', help='Current coronavirus stats in the US')
-async def rona(ctx, state='All'):
+async def rona(ctx, state='all'):
     url = 'covidtracking.com/api/states'
     request = 'https://{}'.format(url)
     response = requests.get(request)
-    await ctx.send(response)
+    rona_json = json.load(response.json())
+    if state == all:
+        for state in rona_json:
+            await ctx.send(rona_json)
+    
 
 # @bot.event
 # async def on_error(event, *args, **kwargs):
@@ -95,6 +140,9 @@ async def rona(ctx, state='All'):
 #         else:
 #             raise NotImplementedError
 
+'''
+Error handling
+'''
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
