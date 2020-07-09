@@ -79,6 +79,50 @@ async def bruh_mp3(ctx, length: int = 1):
         await vc.disconnect()
         
 
+@bot.command(name='rough', help="For when your friend's girlfriend turns into the moon")
+async def rough(ctx):
+    # grab the user who sent the command
+    voice_state = ctx.author.voice
+    channel = None
+    # validation
+    if voice_state == None:
+        await ctx.send('User outside of a voice channel')
+    else:
+        # grab user's voice channel
+        channel = voice_state.channel
+        # await ctx.send('Channel {}: bruh{} '.format(channel.name, 'hhh' * length))
+        # create StreamPlayer
+        vc = await channel.connect()
+        options = '-ss 5'
+        vc.play(discord.FFmpegPCMAudio(
+            source='sounds/rough.mp3', 
+            options=options))
+        vc.volume = 100
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        await vc.disconnect()
+
+@bot.command(name='ohno', help='Oh no')
+async def ohno(ctx):
+    # grab the user who sent the command
+    voice_state = ctx.author.voice
+    channel = None
+    # validation
+    if voice_state == None:
+        await ctx.send('The Bruh was uttered but it did not make a sound, user outside of a voice channel')
+    else:
+        # grab user's voice channel
+        channel = voice_state.channel
+        # await ctx.send('Channel {}: bruh{} '.format(channel.name, 'hhh' * length))
+        # create StreamPlayer
+        vc = await channel.connect()
+        vc.play(discord.FFmpegPCMAudio(
+            source='sounds/ono.mp3'))
+        vc.volume = 100
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        await vc.disconnect()
+
 @bot.command(name='airhorn', help='Brrrrrrr!')
 async def airhorn_mp3(ctx, count: int = 1):
     # grab the user who sent the command
