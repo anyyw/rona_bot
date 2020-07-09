@@ -1,6 +1,10 @@
-# Ronabot
+# Bruhbot
 
-Small discord bot written in python that reports current COVID19/Coronavirus case statistics
+Small discord bot written in python that does the following:
+
+- Soundclips
+- Rolls dice
+- (WIP) Reports current COVID19/Coronavirus case statistics
 
 ## Depencencies
 - Python 3.6
