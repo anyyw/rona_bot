@@ -1,12 +1,13 @@
-#Ronabot
+# Ronabot
 
 Small discord bot written in python that reports current COVID19/Coronavirus case statistics
 
-##Depencencies
+## Depencencies
 - Python 3.6
+- ffmpeg
 - Discord.py
 
-##Usage
+## Usage
 
 - Clone repo
 - Sign up in discord dev portal
