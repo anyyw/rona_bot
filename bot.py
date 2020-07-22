@@ -35,7 +35,7 @@ async def print_debug(context):
     response = 'Beep Boop, I here'
     await context.send(response)
 
-@bot.command(name='roll_dice', help='Simulates rolling dice.')
+@bot.command(name='roll_dice', help='Simulates rolling dice, ex usage !roll_dice <num_dice> <num_sides>')
 async def roll(ctx, number_of_dice: int, number_of_sides: int):
     dice = [
         str(random.choice(range(1, number_of_sides + 1)))
@@ -47,16 +47,17 @@ async def roll(ctx, number_of_dice: int, number_of_sides: int):
 # async def bruh(ctx, bruh_length: int):
 #     await ctx.send('Bruuu' + ('h' * bruh_length))
 
-@bot.command(name='bruh', help='Bruh in voice channel.')
+@bot.command(name='bruh', help='Bruh in voice channel with ability to add length, ex !bruh <bruh_length>')
 async def bruh_mp3(ctx, length: int = 1):
     # grab the user who sent the command
     voice_state = ctx.author.voice
     channel = None
     # validation
+    # There should prob be handling of invalid input types, but whatever
     if length > 10:
         await ctx.send('Bruh too long, pls stop')
     elif length <= 0:
-        await ctx.send('Y Bruh less than or equal to 0?')
+        await ctx.send('Bruh too short or negative, wat')
     elif voice_state == None:
         await ctx.send('The Bruh was uttered but it did not make a sound, user outside of a voice channel')
     else:
@@ -79,7 +80,7 @@ async def bruh_mp3(ctx, length: int = 1):
         await vc.disconnect()
         
 
-@bot.command(name='rough', help="For when your friend's girlfriend turns into the moon")
+@bot.command(name='rough', help="For when your friend's girlfriend turns into the moon. Usage: !rough")
 async def rough(ctx):
     # grab the user who sent the command
     voice_state = ctx.author.voice
@@ -102,7 +103,7 @@ async def rough(ctx):
             await asyncio.sleep(1)
         await vc.disconnect()
 
-@bot.command(name='ohno', help='Oh no')
+@bot.command(name='ohno', help='Oh no, usage: !ohno')
 async def ohno(ctx):
     # grab the user who sent the command
     voice_state = ctx.author.voice
@@ -123,7 +124,7 @@ async def ohno(ctx):
             await asyncio.sleep(1)
         await vc.disconnect()
 
-@bot.command(name='airhorn', help='Brrrrrrr!')
+@bot.command(name='airhorn', help='Brrrrrrr! Usage: !airhorn <num_airhorn_blasts>')
 async def airhorn_mp3(ctx, count: int = 1):
     # grab the user who sent the command
     voice_state = ctx.author.voice
@@ -165,7 +166,7 @@ Command that shows stats on current coronavirus, hopefully this will be outdated
 TODO: Current implementation makes a request per command, since the website likely updates
 daily, we should just be able to cache the json and update it every day on command read
 '''
-@bot.command(name='rona', help='Current coronavirus stats in the US')
+@bot.command(name='rona', help='Current coronavirus stats in the US, Work in progress')
 async def rona(ctx, state='all'):
     url = 'covidtracking.com/api/states'
     request = 'https://{}'.format(url)
