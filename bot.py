@@ -181,9 +181,15 @@ async def rona(ctx, queried_state='all'):
         print(returned)
         #await ctx.send(returned)
     else:    
-        state_stats = json.dumps(rona_json[state])
-        print(state_stats)
-        #await ctx.send(state_stats)
+        try:
+            state_stats = [s for s in rona_json if s[state] == queried_state ]
+            returned = ""
+            for day in state_stats:
+                returned += "date: {}, positive: {}".format(state_stats["date"], state_stats["positive"])
+            print(returned)
+            await ctx.send(returned)
+        except:
+            ctx.send("invalid")
         
     
 
@@ -194,7 +200,6 @@ async def rona(ctx, queried_state='all'):
 #             f.write(f'Unhandled message: {args[0]}\n')
 #         else:
 #             raise NotImplementedError
-
 '''
 Error handling
 '''
