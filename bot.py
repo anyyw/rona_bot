@@ -164,14 +164,25 @@ TODO: Current implementation makes a request per command, since the website like
 daily, we should just be able to cache the json and update it every day on command read
 '''
 @bot.command(name='rona', help='Current coronavirus stats in the US, Work in progress')
-async def rona(ctx, state='all'):
+async def rona(ctx, queried_state='all'):
     url = 'covidtracking.com/api/states'
     request = 'https://{}'.format(url)
     response = requests.get(request)
-    rona_json = json.load(response.json())
-    if state == all:
+    rona_json = response.json()
+    print(rona_json)
+    #states = rona_json.keys()
+    if queried_state == 'all':
         for state in rona_json:
-            await ctx.send(rona_json)
+            state_stats = json.dumps(state)
+            print(state_stats)
+            #await ctx.send(state_stats)
+    elif queried_state in states:    
+        state_stats = json.dumps(rona_json[state])
+        print(state_stats)
+        #await ctx.send(state_stats)
+    else:
+        ctx.send('Bruh, that aint a state')
+        
     
 
 # @bot.event
