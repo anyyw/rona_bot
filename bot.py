@@ -165,23 +165,25 @@ daily, we should just be able to cache the json and update it every day on comma
 '''
 @bot.command(name='rona', help='Current coronavirus stats in the US, Work in progress')
 async def rona(ctx, queried_state='all'):
-    url = 'covidtracking.com/api/states'
+    url = 'covidtracking.com/api/states/daily'
     request = 'https://{}'.format(url)
     response = requests.get(request)
     rona_json = response.json()
-    print(rona_json)
-    #states = rona_json.keys()
     if queried_state == 'all':
-        for state in rona_json:
-            state_stats = json.dumps(state)
-            print(state_stats)
-            #await ctx.send(state_stats)
-    elif queried_state in states:    
+        returned = ""
+        for state_stats in rona_json:
+            #state_stats = json.dumps(state)
+            #print(state_stats)
+            state_name = state_stats["state"]
+            state_positive = state_stats["positive"]
+            date = state_stats["date"]
+            returned += "{}, {}: {} positive cases\n".format(date, state_name, state_positive)
+        print(returned)
+        #await ctx.send(returned)
+    else:    
         state_stats = json.dumps(rona_json[state])
         print(state_stats)
         #await ctx.send(state_stats)
-    else:
-        ctx.send('Bruh, that aint a state')
         
     
 
