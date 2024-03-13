@@ -164,14 +164,33 @@ TODO: Current implementation makes a request per command, since the website like
 daily, we should just be able to cache the json and update it every day on command read
 '''
 @bot.command(name='rona', help='Current coronavirus stats in the US, Work in progress')
-async def rona(ctx, state='all'):
-    url = 'covidtracking.com/api/states'
+async def rona(ctx, queried_state='all'):
+    url = 'covidtracking.com/api/states/daily'
     request = 'https://{}'.format(url)
     response = requests.get(request)
-    rona_json = json.load(response.json())
-    if state == all:
-        for state in rona_json:
-            await ctx.send(rona_json)
+    rona_json = response.json()
+    if queried_state == 'all':
+        returned = ""
+        for state_stats in rona_json:
+            #state_stats = json.dumps(state)
+            #print(state_stats)
+            state_name = state_stats["state"]
+            state_positive = state_stats["positive"]
+            date = state_stats["date"]
+            returned += "{}, {}: {} positive cases\n".format(date, state_name, state_positive)
+        print(returned)
+        #await ctx.send(returned)
+    else:    
+        try:
+            state_stats = [s for s in rona_json if s[state] == queried_state ]
+            returned = ""
+            for day in state_stats:
+                returned += "date: {}, positive: {}".format(state_stats["date"], state_stats["positive"])
+            print(returned)
+            await ctx.send(returned)
+        except:
+            ctx.send("invalid")
+        
     
 
 # @bot.event
@@ -181,7 +200,6 @@ async def rona(ctx, state='all'):
 #             f.write(f'Unhandled message: {args[0]}\n')
 #         else:
 #             raise NotImplementedError
-
 '''
 Error handling
 '''
