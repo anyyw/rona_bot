@@ -5,6 +5,7 @@ import requests
 import random
 import json
 import asyncio
+from io import BytesIO
 from dotenv import load_dotenv
 
 from discord.ext import commands
@@ -142,23 +143,19 @@ async def airhorn_mp3(ctx, count: int = 1):
         # await ctx.send('Channel {}: bruh{} '.format(channel.name, 'hhh' * length))
         # create StreamPlayer
         vc = await channel.connect()
-        # play mini length airhorns
-        for i in range(count - 1):
-            clip = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
-                source='audio/airhorn_default.wav',
-                options='-to 0.22'))
-            clip.volume = 0.3
-            vc.play(clip)
-            while vc.is_playing():
-                await asyncio.sleep(0.01)
-        
-        # play last full length airhorn
+        # because discord ffmpeg implementation can only read files, not concat filters,
+        # we need to write to a temp file and send that in for concatnating airhorns
+        with open("temp.txt", "a") as file:
+            file.write("{}file './sounds/airhorn.wav'".format(
+            "file './sounds/airhorn-short.wav'\n" * (count - 1)))
         clip = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(
-            source='audio/airhorn_default.wav'))
+            source="temp.txt",
+            before_options='-f concat -safe 0'))
         clip.volume = 0.3
         vc.play(clip)
         while vc.is_playing():
             await asyncio.sleep(0.1)
+        os.remove("temp.txt")
         await vc.disconnect()
 
 '''
